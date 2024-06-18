@@ -1,5 +1,5 @@
 [package]
-name = "quickxml2ndjson"
+name = "efetch2jsonl"
 version = "0.1.0"
 edition = "2021"
 
