@@ -1,0 +1,12 @@
+[package]
+name = "quickxml2ndjson"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = { version = "1.0.86", features = ["backtrace"] }
+clap = { version = "4.5.7", features = ["derive"] }
+clap_derive = "4.5.5"
+quick-xml = "0.32.0"
+serde-jsonlines = "0.5.0"
+serde_json = "1.0.117"
