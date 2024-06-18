@@ -1,7 +1,10 @@
 [package]
 name = "efetch2jsonl"
-version = "0.1.0"
+authors = ["Hologenomix Team <contact@hologenomix.nl>"]
+version = "1.0.0"
 edition = "2021"
+license = "MIT"
+description = "Convert EFetch XML to JSON Lines"
 
 [dependencies]
 anyhow = { version = "1.0.86", features = ["backtrace"] }
