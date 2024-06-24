@@ -5,14 +5,21 @@ use quick_xml::events::Event;
 
 #[derive(clap::Parser)]
 struct Options {
+    /// The input file
     #[arg(short, long)]
     pub input_file: PathBuf,
+    /// The output file
     #[arg(short, long)]
     pub output: PathBuf,
+    /// What should be used to join the keys to form a unique key
     #[arg(short, long, default_value = ".")]
     pub key_separator: String,
+    /// What should be used as the key for a row?
     #[arg(short, long, default_value = "EXPERIMENT_PACKAGE")]
     pub row_separator: String,
+    // /// Show a progress indicator
+    // #[arg(short, long)]
+    // pub progress: bool,
 }
 
 fn main() {
@@ -37,11 +44,16 @@ fn run(options: Options) -> anyhow::Result<()> {
     loop {
         match f.read_event_into(&mut buf) {
             // Parsing error -> Invalid XML
-            Err(e) => panic!(
-                "Invalid XML: Error at position {}: {:?}",
-                f.buffer_position(),
-                e
-            ),
+            Err(e) => {
+                // Parsing error -> Invalid XML, let's print out what we had till now though
+                eprintln!(
+                    "Invalid XML: Error at position {}: {:?}",
+                    f.buffer_position(),
+                    e
+                );
+                eprintln!("parsing will stop, but current output will be written");
+                break;
+            }
             // End of the file -> we're done, can start outputting
             Ok(Event::Eof) => break,
             // We ignore these events as they should not have any content for us
@@ -101,11 +113,13 @@ fn run(options: Options) -> anyhow::Result<()> {
     // Check that the stack and dictionary are empty
     if !stack.is_empty() {
         eprintln!("Stack is not empty");
-        eprintln!("{:?}", stack);
+        eprintln!("{:?}", stack.iter().map(|x| String::from_utf8_lossy(x).to_string()).collect::<Vec<String>>());
     }
     if !dictionary.is_empty() {
-        eprintln!("Dictionary is not empty");
-        eprintln!("{:?}", dictionary);
+        eprintln!("Dictionary is not empty, printing to err.log");
+        eprintln!("Keys: {:?}", dictionary.keys());
+        serde_jsonlines::write_json_lines(&PathBuf::from("err.log"), &dictionary)?;
+        // eprintln!("{:?}", dictionary);
     }
     eprintln!("Finished reading the file");
     serde_jsonlines::write_json_lines(&options.output, &output_vec)?;
